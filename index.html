@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0d0d0d" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="apple-mobile-web-app-title" content="Foco" />
+  <title>Foco</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0d0d0d; color: #f0ede6; font-family: Georgia, serif; min-height: 100vh; padding-bottom: 60px; }
+    input, textarea, select, button { font-family: Georgia, serif; }
+    input[type="datetime-local"] { color-scheme: dark; }
+
+    #header { background: #111; border-bottom: 1px solid #1e1e1e; padding: 18px 16px 14px; }
+    #header .sub { font-family: monospace; font-size: 8px; letter-spacing: 3px; color: #2a2a2a; text-transform: uppercase; margin-bottom: 4px; }
+    #header .top { display: flex; justify-content: space-between; align-items: flex-end; }
+    #header h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+    #header .date { font-family: monospace; font-size: 9px; color: #2a2a2a; text-transform: capitalize; text-align: right; }
+    #stats { margin-top: 10px; display: flex; gap: 16px; font-family: monospace; font-size: 10px; }
+
+    #main { padding: 16px 14px; }
+
+    #btn-new {
+      width: 100%; background: #f0c040; border: none; border-radius: 6px; color: #000;
+      font-size: 13px; font-weight: 700; font-family: monospace; letter-spacing: 1px;
+      padding: 12px; cursor: pointer; margin-bottom: 16px; text-transform: uppercase;
+    }
+
+    #empty { text-align: center; padding: 50px 0; color: #222; }
+    #empty .icon { font-size: 36px; margin-bottom: 12px; }
+    #empty .label { font-family: monospace; font-size: 11px; letter-spacing: 2px; }
+    #empty .sub { font-size: 12px; margin-top: 8px; color: #1e1e1e; }
+
+    .obj-card { background: #161616; border: 1px solid #222; border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+    .obj-card.urgent { border-color: #ff880033; }
+    .obj-card.expired { border-color: #ff333344; }
+
+    .obj-header { padding: 14px 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .obj-title { font-size: 15px; font-weight: 700; color: #f0ede6; margin-bottom: 3px; line-height: 1.3; }
+    .obj-title.empty { color: #333; font-style: italic; }
+    .obj-countdown { font-size: 10px; font-family: monospace; }
+    .obj-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .obj-arrow { color: #444; font-size: 12px; }
+
+    .obj-body { border-top: 1px solid #222; display: none; }
+    .obj-body.open { display: block; }
+
+    .tabs { display: flex; border-bottom: 1px solid #222; }
+    .tab-btn {
+      flex: 1; background: transparent; border: none; border-bottom: 2px solid transparent;
+      color: #444; padding: 8px 2px; font-size: 8px; font-family: monospace;
+      letter-spacing: 0.5px; cursor: pointer; text-transform: uppercase;
+    }
+    .tab-btn.active { background: #1f1f1f; border-bottom-color: #f0c040; color: #f0c040; }
+
+    .tab-content { padding: 14px 16px; display: none; }
+    .tab-content.active { display: block; }
+
+    label.field { display: block; font-size: 9px; font-family: monospace; letter-spacing: 2px; color: #555; text-transform: uppercase; margin-bottom: 4px; margin-top: 12px; }
+    label.field:first-child { margin-top: 0; }
+    .field-input {
+      width: 100%; background: #111; border: 1px solid #2a2a2a; border-radius: 4px;
+      color: #f0ede6; font-size: 13px; padding: 8px 10px; font-family: Georgia, serif; outline: none;
+    }
+    textarea.field-input { resize: vertical; }
+
+    .btn-delete {
+      background: none; border: 1px solid #ff333344; color: #ff5555;
+      border-radius: 4px; padding: 5px 12px; cursor: pointer; font-size: 11px; font-family: monospace;
+      margin-top: 16px; float: right;
+    }
+
+    .blockers-list, .resources-list { margin-bottom: 8px; }
+    .blocker-item, .resource-item { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+    .check-box {
+      width: 14px; height: 14px; border-radius: 3px; border: 1px solid #ff5555;
+      background: transparent; cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 9px; color: #52c47e;
+    }
+    .check-box.solved { border-color: #52c47e; background: #52c47e22; }
+    .blocker-text { flex: 1; font-size: 13px; color: #f0ede6; }
+    .blocker-text.solved { color: #444; text-decoration: line-through; }
+    .resource-dot { width: 6px; height: 6px; border-radius: 50%; background: #f0c040; flex-shrink: 0; }
+    .resource-text { flex: 1; font-size: 13px; color: #f0ede6; }
+    .btn-x { background: none; border: none; color: #333; cursor: pointer; font-size: 12px; padding: 0; flex-shrink: 0; }
+
+    .add-row { display: flex; gap: 6px; margin-top: 8px; }
+    .add-row .field-input { flex: 1; }
+    .btn-add {
+      background: #f0c040; border: none; color: #000; border-radius: 4px;
+      padding: 0 14px; cursor: pointer; font-size: 18px; font-weight: 700; flex-shrink: 0;
+    }
+
+    .hint { font-size: 11px; color: #555; margin-bottom: 12px; font-style: italic; }
+
+    .timer-block { background: #111; border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; border-left: 3px solid; }
+    .timer-label { font-size: 9px; font-family: monospace; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; opacity: 0.8; }
+    .timer-units { display: flex; gap: 6px; flex-wrap: wrap; }
+    .timer-unit { text-align: center; min-width: 36px; }
+    .timer-val { font-family: monospace; font-weight: 700; line-height: 1; }
+    .timer-lbl { font-size: 8px; color: #444; font-family: monospace; margin-top: 2px; }
+    .timer-created { margin-top: 10px; font-size: 10px; color: #2a2a2a; font-family: monospace; letter-spacing: 1px; text-align: center; }
+    .no-deadline { font-size: 11px; color: #444; font-style: italic; margin-top: 8px; }
+  </style>
+</head>
+<body>
+
+<div id="header">
+  <div class="sub">sistema de foco</div>
+  <div class="top">
+    <h1>Meus Objetivos</h1>
+    <div class="date" id="date-display"></div>
+  </div>
+  <div id="stats" style="display:none"></div>
+</div>
+
+<div id="main">
+  <button id="btn-new">+ novo objetivo</button>
+  <div id="empty">
+    <div class="icon">◎</div>
+    <div class="label">NENHUM OBJETIVO AINDA</div>
+    <div class="sub">O tempo tá passando de qualquer jeito.</div>
+  </div>
+  <div id="objectives-list"></div>
+</div>
+
+<script>
+const STORAGE_KEY = "foco-v2";
+
+function load() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { return []; }
+}
+function save(data) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch {}
+}
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,5); }
+
+function splitTime(ms) {
+  if (ms < 0) ms = 0;
+  return {
+    y:  Math.floor(ms / 31536000000),
+    mo: Math.floor(ms / 2592000000) % 12,
+    d:  Math.floor(ms / 86400000) % 30,
+    h:  Math.floor(ms / 3600000) % 24,
+    m:  Math.floor(ms / 60000) % 60,
+    s:  Math.floor(ms / 1000) % 60,
+  };
+}
+
+function fmtFull(t) {
+  return ((t.y?t.y+"a ":"")+(t.mo?t.mo+"m ":"")+(t.d?t.d+"d ":"")+(t.h?t.h+"h ":"")+(t.m?t.m+"min ":"")+t.s+"s").trim();
+}
+
+function pad(n) { return String(n).padStart(2,"0"); }
+
+let objectives = load();
+let openId = null;
+let tickInterval = null;
+
+// Date display
+document.getElementById("date-display").textContent =
+  new Date().toLocaleDateString("pt-BR", {weekday:"long", day:"numeric", month:"long"});
+
+document.getElementById("btn-new").onclick = () => {
+  const novo = { id: uid(), title: "", why: "", deadline: null, createdAt: Date.now(), blockers: [], resources: [] };
+  objectives.unshift(novo);
+  save(objectives);
+  openId = novo.id;
+  render();
+};
+
+function updateStats() {
+  const expired = objectives.filter(o => o.deadline && o.deadline < Date.now()).length;
+  const urgent  = objectives.filter(o => o.deadline && o.deadline > Date.now() && o.deadline - Date.now() < 86400000*3).length;
+  const statsEl = document.getElementById("stats");
+  if (objectives.length === 0) { statsEl.style.display = "none"; return; }
+  statsEl.style.display = "flex";
+  statsEl.innerHTML =
+    (expired ? `<span style="color:#ff3333">${expired} expirado${expired>1?"s":""}</span>` : "") +
+    (urgent  ? `<span style="color:#ff8800">${urgent} urgente${urgent>1?"s":""}</span>` : "") +
+    `<span style="color:#333">${objectives.length} total</span>`;
+}
+
+function renderTimerBlock(ms, label, color, urgent) {
+  const t = splitTime(ms);
+  const units = [
+    {v:t.y,l:"anos"},{v:t.mo,l:"meses"},{v:t.d,l:"dias"},
+    {v:t.h,l:"horas"},{v:t.m,l:"min"},{v:t.s,l:"seg"}
+  ];
+  const urgentIds = ["dias","horas"];
+  return `
+    <div class="timer-block" style="border-left-color:${color}; border-color:${color}22" data-timer-ms="${ms}" data-timer-color="${color}" data-timer-urgent="${urgent}" data-timer-label="${label}">
+      <div class="timer-label" style="color:${color}">${urgent?"⚠ ":""}${label}</div>
+      <div class="timer-units">
+        ${units.map(u => `
+          <div class="timer-unit">
+            <div class="timer-val" style="font-size:${u.l==="anos"||u.l==="meses"?18:u.l==="dias"?22:15}px;color:${urgent&&urgentIds.includes(u.l)?"#ff4444":color}">${pad(u.v)}</div>
+            <div class="timer-lbl">${u.l}</div>
+          </div>`).join("")}
+      </div>
+    </div>`;
+}
+
+function renderCard(obj) {
+  const now = Date.now();
+  const elapsed   = now - obj.createdAt;
+  const remaining = obj.deadline ? obj.deadline - now : null;
+  const isExpired = remaining !== null && remaining < 0;
+  const isUrgent  = remaining !== null && remaining >= 0 && remaining < 86400000*3;
+  const statusColor = isExpired ? "#ff3333" : isUrgent ? "#ff8800" : "#f0c040";
+  const isOpen = openId === obj.id;
+
+  let countdownHtml = "";
+  if (obj.deadline) {
+    if (isExpired) countdownHtml = `<div class="obj-countdown" style="color:#ff3333">EXPIRADO — ${fmtFull(splitTime(Math.abs(remaining)))} atrasado</div>`;
+    else countdownHtml = `<div class="obj-countdown" style="color:${statusColor}">${fmtFull(splitTime(remaining))} restando</div>`;
+  }
+
+  // Tab: geral
+  const deadlineVal = obj.deadline ? new Date(obj.deadline).toISOString().slice(0,16) : "";
+  const tabGeral = `
+    <div class="tab-content ${isOpen && getOpenTab(obj.id)==="geral"?"active":""}" data-tab="geral">
+      <label class="field">Título</label>
+      <input class="field-input" type="text" placeholder="Nome do objetivo" value="${escHtml(obj.title)}" data-field="title" />
+      <label class="field">Por que isso importa?</label>
+      <textarea class="field-input" placeholder="Escreva o motivo real. Seja honesto." rows="3" data-field="why">${escHtml(obj.why)}</textarea>
+      <label class="field">Prazo (deadline)</label>
+      <input class="field-input" type="datetime-local" value="${deadlineVal}" data-field="deadline" />
+      <div style="overflow:hidden"><button class="btn-delete" data-delete="${obj.id}">deletar objetivo</button></div>
+    </div>`;
+
+  // Tab: bloqueios
+  const blockersHtml = (obj.blockers||[]).map(b => `
+    <div class="blocker-item">
+      <div class="check-box ${b.solved?"solved":""}" data-toggle-blocker="${b.id}">✓</div>
+      <span class="blocker-text ${b.solved?"solved":""}">${escHtml(b.text)}</span>
+      <button class="btn-x" data-remove-blocker="${b.id}">✕</button>
+    </div>`).join("");
+  const tabBlockers = `
+    <div class="tab-content ${isOpen && getOpenTab(obj.id)==="bloqueios"?"active":""}" data-tab="bloqueios">
+      <p class="hint">O que tá te impedindo de avançar? Nomeie. Enfrente.</p>
+      <div class="blockers-list">${blockersHtml}</div>
+      <div class="add-row">
+        <input class="field-input" type="text" placeholder="Adicionar bloqueio..." data-new-blocker />
+        <button class="btn-add" data-add-blocker>+</button>
+      </div>
+    </div>`;
+
+  // Tab: recursos
+  const resourcesHtml = (obj.resources||[]).map(r => `
+    <div class="resource-item">
+      <div class="resource-dot"></div>
+      <span class="resource-text">${escHtml(r.text)}</span>
+      <button class="btn-x" data-remove-resource="${r.id}">✕</button>
+    </div>`).join("");
+  const tabResources = `
+    <div class="tab-content ${isOpen && getOpenTab(obj.id)==="recursos"?"active":""}" data-tab="recursos">
+      <p class="hint">O que você PRECISA pra concluir esse objetivo?</p>
+      <div class="resources-list">${resourcesHtml}</div>
+      <div class="add-row">
+        <input class="field-input" type="text" placeholder="Ex: aprender X, comprar Y, falar com Z..." data-new-resource />
+        <button class="btn-add" data-add-resource>+</button>
+      </div>
+    </div>`;
+
+  // Tab: cronômetro
+  let timerContent = renderTimerBlock(elapsed, "tempo que já foi embora desde que você criou isso", "#666", false);
+  if (obj.deadline) {
+    if (isExpired) timerContent += renderTimerBlock(Math.abs(remaining), "tempo que você deixou passar do prazo", "#ff3333", true);
+    else timerContent += renderTimerBlock(remaining, "tempo que ainda resta — use bem", isUrgent?"#ff8800":"#f0c040", isUrgent);
+  } else {
+    timerContent += `<div class="no-deadline">Defina um prazo na aba "geral" pra ver o contador regressivo.</div>`;
+  }
+  const tabTimer = `
+    <div class="tab-content ${isOpen && getOpenTab(obj.id)==="cronômetro"?"active":""}" data-tab="cronômetro" data-obj-id="${obj.id}">
+      ${timerContent}
+      <div class="timer-created">CRIADO EM ${new Date(obj.createdAt).toLocaleDateString("pt-BR")}</div>
+    </div>`;
+
+  return `
+    <div class="obj-card ${isExpired?"expired":isUrgent?"urgent":""}" data-obj-id="${obj.id}">
+      <div class="obj-header" data-toggle="${obj.id}">
+        <div style="flex:1">
+          <div class="obj-title ${obj.title?"":"empty"}">${obj.title ? escHtml(obj.title) : "sem título"}</div>
+          ${countdownHtml}
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="obj-dot" style="background:${statusColor};box-shadow:0 0 6px ${statusColor}66"></div>
+          <span class="obj-arrow">${isOpen?"▲":"▼"}</span>
+        </div>
+      </div>
+      <div class="obj-body ${isOpen?"open":""}">
+        <div class="tabs">
+          ${[["geral","◎"],["bloqueios","⚡"],["recursos","🔧"],["cronômetro","⏱"]].map(([t,ic]) =>
+            `<button class="tab-btn ${isOpen && getOpenTab(obj.id)===t?"active":""}" data-tab-btn="${t}" data-obj="${obj.id}">${ic} ${t}</button>`
+          ).join("")}
+        </div>
+        ${tabGeral}${tabBlockers}${tabResources}${tabTimer}
+      </div>
+    </div>`;
+}
+
+// Track open tab per objective
+const openTabs = {};
+function getOpenTab(id) { return openTabs[id] || "geral"; }
+
+function render() {
+  updateStats();
+  const sorted = [...objectives].sort((a,b) => {
+    const ra = a.deadline ? a.deadline - Date.now() : Infinity;
+    const rb = b.deadline ? b.deadline - Date.now() : Infinity;
+    return ra - rb;
+  });
+  document.getElementById("empty").style.display = objectives.length === 0 ? "block" : "none";
+  document.getElementById("objectives-list").innerHTML = sorted.map(renderCard).join("");
+  attachEvents();
+  startTick();
+}
+
+function attachEvents() {
+  // Toggle open/close
+  document.querySelectorAll("[data-toggle]").forEach(el => {
+    el.onclick = () => {
+      const id = el.dataset.toggle;
+      openId = openId === id ? null : id;
+      render();
+    };
+  });
+
+  // Tab buttons
+  document.querySelectorAll("[data-tab-btn]").forEach(el => {
+    el.onclick = (e) => {
+      e.stopPropagation();
+      const objId = el.dataset.obj;
+      const tab = el.dataset.tabBtn;
+      openTabs[objId] = tab;
+      // Update active tab UI without full re-render
+      const card = el.closest(".obj-card");
+      card.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tabBtn === tab));
+      card.querySelectorAll(".tab-content").forEach(c => c.classList.toggle("active", c.dataset.tab === tab));
+    };
+  });
+
+  // Field changes
+  document.querySelectorAll("[data-field]").forEach(el => {
+    el.oninput = () => {
+      const card = el.closest(".obj-card");
+      const id = card.dataset.objId;
+      const obj = objectives.find(o => o.id === id);
+      if (!obj) return;
+      const field = el.dataset.field;
+      if (field === "deadline") {
+        obj.deadline = el.value ? new Date(el.value).getTime() : null;
+      } else {
+        obj[field] = el.value;
+      }
+      save(objectives);
+      // Update title in header without full re-render
+      const titleEl = card.querySelector(".obj-title");
+      if (field === "title") {
+        titleEl.textContent = el.value || "sem título";
+        titleEl.classList.toggle("empty", !el.value);
+      }
+      updateStats();
+    };
+  });
+
+  // Delete objective
+  document.querySelectorAll("[data-delete]").forEach(el => {
+    el.onclick = () => {
+      const id = el.dataset.delete;
+      objectives = objectives.filter(o => o.id !== id);
+      if (openId === id) openId = null;
+      save(objectives);
+      render();
+    };
+  });
+
+  // Add blocker
+  document.querySelectorAll("[data-add-blocker]").forEach(el => {
+    el.onclick = () => {
+      const card = el.closest(".obj-card");
+      const id = card.dataset.objId;
+      const input = card.querySelector("[data-new-blocker]");
+      if (!input.value.trim()) return;
+      const obj = objectives.find(o => o.id === id);
+      if (!obj) return;
+      obj.blockers = obj.blockers || [];
+      obj.blockers.push({ id: uid(), text: input.value.trim(), solved: false });
+      save(objectives);
+      openTabs[id] = "bloqueios";
+      render();
+    };
+  });
+
+  document.querySelectorAll("[data-new-blocker]").forEach(el => {
+    el.onkeydown = (e) => { if (e.key === "Enter") el.closest(".obj-card").querySelector("[data-add-blocker]").click(); };
+  });
+
+  // Toggle blocker
+  document.querySelectorAll("[data-toggle-blocker]").forEach(el => {
+    el.onclick = () => {
+      const card = el.closest(".obj-card");
+      const id = card.dataset.objId;
+      const bid = el.dataset.toggleBlocker;
+      const obj = objectives.find(o => o.id === id);
+      if (!obj) return;
+      const b = obj.blockers.find(b => b.id === bid);
+      if (b) b.solved = !b.solved;
+      save(objectives);
+      openTabs[id] = "bloqueios";
+      render();
+    };
+  });
+
+  // Remove blocker
+  document.querySelectorAll("[data-remove-blocker]").forEach(el => {
+    el.onclick = () => {
+      const card = el.closest(".obj-card");
+      const id = card.dataset.objId;
+      const bid = el.dataset.removeBlocker;
+      const obj = objectives.find(o => o.id === id);
+      if (!obj) return;
+      obj.blockers = obj.blockers.filter(b => b.id !== bid);
+      save(objectives);
+      openTabs[id] = "bloqueios";
+      render();
+    };
+  });
+
+  // Add resource
+  document.querySelectorAll("[data-add-resource]").forEach(el => {
+    el.onclick = () => {
+      const card = el.closest(".obj-card");
+      const id = card.dataset.objId;
+      const input = card.querySelector("[data-new-resource]");
+      if (!input.value.trim()) return;
+      const obj = objectives.find(o => o.id === id);
+      if (!obj) return;
+      obj.resources = obj.resources || [];
+      obj.resources.push({ id: uid(), text: input.value.trim() });
+      save(objectives);
+      openTabs[id] = "recursos";
+      render();
+    };
+  });
+
+  document.querySelectorAll("[data-new-resource]").forEach(el => {
+    el.onkeydown = (e) => { if (e.key === "Enter") el.closest(".obj-card").querySelector("[data-add-resource]").click(); };
+  });
+
+  // Remove resource
+  document.querySelectorAll("[data-remove-resource]").forEach(el => {
+    el.onclick = () => {
+      const card = el.closest(".obj-card");
+      const id = card.dataset.objId;
+      const rid = el.dataset.removeResource;
+      const obj = objectives.find(o => o.id === id);
+      if (!obj) return;
+      obj.resources = obj.resources.filter(r => r.id !== rid);
+      save(objectives);
+      openTabs[id] = "recursos";
+      render();
+    };
+  });
+}
+
+function startTick() {
+  if (tickInterval) clearInterval(tickInterval);
+  tickInterval = setInterval(tick, 1000);
+}
+
+function tick() {
+  updateStats();
+  // Update countdowns in headers
+  document.querySelectorAll(".obj-card").forEach(card => {
+    const id = card.dataset.objId;
+    const obj = objectives.find(o => o.id === id);
+    if (!obj) return;
+    const now = Date.now();
+    const remaining = obj.deadline ? obj.deadline - now : null;
+    const isExpired = remaining !== null && remaining < 0;
+    const isUrgent  = remaining !== null && remaining >= 0 && remaining < 86400000*3;
+    const statusColor = isExpired ? "#ff3333" : isUrgent ? "#ff8800" : "#f0c040";
+    const cdEl = card.querySelector(".obj-countdown");
+    if (cdEl && obj.deadline) {
+      if (isExpired) cdEl.textContent = `EXPIRADO — ${fmtFull(splitTime(Math.abs(remaining)))} atrasado`;
+      else cdEl.textContent = `${fmtFull(splitTime(remaining))} restando`;
+      cdEl.style.color = statusColor;
+    }
+    // Update timer tab if open
+    const timerTab = card.querySelector(".tab-content[data-tab='cronômetro']");
+    if (timerTab && timerTab.classList.contains("active")) {
+      const elapsed = now - obj.createdAt;
+      const blocks = timerTab.querySelectorAll(".timer-block");
+      // Elapsed block
+      if (blocks[0]) updateTimerBlock(blocks[0], elapsed);
+      // Remaining/expired block
+      if (blocks[1] && obj.deadline) {
+        if (isExpired) updateTimerBlock(blocks[1], Math.abs(remaining));
+        else updateTimerBlock(blocks[1], remaining);
+      }
+    }
+  });
+}
+
+function updateTimerBlock(block, ms) {
+  const t = splitTime(ms);
+  const vals = [t.y, t.mo, t.d, t.h, t.m, t.s];
+  const units = block.querySelectorAll(".timer-val");
+  units.forEach((u, i) => { u.textContent = pad(vals[i]); });
+}
+
+function escHtml(str) {
+  return (str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+render();
+
+// Service Worker
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+</script>
+</body>
+</html>
