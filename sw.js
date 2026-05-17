@@ -1,4 +1,4 @@
-const CACHE = "foco-v1";
+const CACHE = "foco-v3";
 const FILES = ["./", "./index.html"];
 
 self.addEventListener("install", e => {

@@ -1,529 +1,722 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0d0d0d" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-  <meta name="apple-mobile-web-app-title" content="Foco" />
-  <title>Foco</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #0d0d0d; color: #f0ede6; font-family: Georgia, serif; min-height: 100vh; padding-bottom: 60px; }
-    input, textarea, select, button { font-family: Georgia, serif; }
-    input[type="datetime-local"] { color-scheme: dark; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="theme-color" content="#0d0d0d"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<meta name="apple-mobile-web-app-title" content="Foco"/>
+<title>Foco</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d0d0d;color:#f0ede6;font-family:Georgia,serif;min-height:100vh;padding-bottom:80px}
+input,textarea,select,button{font-family:Georgia,serif}
+input[type="datetime-local"],input[type="time"]{color-scheme:dark}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#111}::-webkit-scrollbar-thumb{background:#2a2a2a}
 
-    #header { background: #111; border-bottom: 1px solid #1e1e1e; padding: 18px 16px 14px; }
-    #header .sub { font-family: monospace; font-size: 8px; letter-spacing: 3px; color: #2a2a2a; text-transform: uppercase; margin-bottom: 4px; }
-    #header .top { display: flex; justify-content: space-between; align-items: flex-end; }
-    #header h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
-    #header .date { font-family: monospace; font-size: 9px; color: #2a2a2a; text-transform: capitalize; text-align: right; }
-    #stats { margin-top: 10px; display: flex; gap: 16px; font-family: monospace; font-size: 10px; }
+/* HEADER */
+#header{background:#111;border-bottom:1px solid #1e1e1e;padding:16px 16px 12px;position:sticky;top:0;z-index:100}
+.header-top{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4px}
+h1{font-size:20px;font-weight:700;letter-spacing:-.5px}
+.header-date{font-family:monospace;font-size:9px;color:#2a2a2a;text-transform:capitalize}
+.header-sub{font-family:monospace;font-size:8px;letter-spacing:3px;color:#222;text-transform:uppercase;margin-bottom:6px}
+#stats{display:flex;gap:14px;font-family:monospace;font-size:10px;flex-wrap:wrap}
 
-    #main { padding: 16px 14px; }
+/* MAIN */
+#main{padding:14px}
+.btn-new{width:100%;background:#f0c040;border:none;border-radius:6px;color:#000;font-size:13px;font-weight:700;font-family:monospace;letter-spacing:1px;padding:12px;cursor:pointer;margin-bottom:14px;text-transform:uppercase}
 
-    #btn-new {
-      width: 100%; background: #f0c040; border: none; border-radius: 6px; color: #000;
-      font-size: 13px; font-weight: 700; font-family: monospace; letter-spacing: 1px;
-      padding: 12px; cursor: pointer; margin-bottom: 16px; text-transform: uppercase;
-    }
+/* EMPTY */
+#empty{text-align:center;padding:50px 0;color:#222;display:none}
+#empty .icon{font-size:36px;margin-bottom:12px}
+#empty .lbl{font-family:monospace;font-size:11px;letter-spacing:2px}
+#empty .sub{font-size:12px;margin-top:8px;color:#1e1e1e}
 
-    #empty { text-align: center; padding: 50px 0; color: #222; }
-    #empty .icon { font-size: 36px; margin-bottom: 12px; }
-    #empty .label { font-family: monospace; font-size: 11px; letter-spacing: 2px; }
-    #empty .sub { font-size: 12px; margin-top: 8px; color: #1e1e1e; }
+/* OBJECTIVE CARD */
+.obj-card{border-radius:8px;margin-bottom:12px;overflow:hidden;border:1px solid #222}
+.obj-card.pri-alta{border-left:3px solid #ff4444}
+.obj-card.pri-média{border-left:3px solid #f0c040}
+.obj-card.pri-baixa{border-left:3px solid #444}
+.obj-card.expired{border-color:#ff333344}
+.obj-card.urgent{border-color:#ff880033}
 
-    .obj-card { background: #161616; border: 1px solid #222; border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
-    .obj-card.urgent { border-color: #ff880033; }
-    .obj-card.expired { border-color: #ff333344; }
+.obj-header{background:#161616;padding:13px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.obj-header-left{flex:1;min-width:0}
+.obj-title-row{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+.obj-title{font-size:15px;font-weight:700;color:#f0ede6;line-height:1.3}
+.obj-title.empty{color:#333;font-style:italic}
+.pri-badge{font-family:monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;padding:2px 6px;border-radius:2px;border:1px solid;flex-shrink:0}
+.pri-badge.alta{color:#ff4444;border-color:#ff444444}
+.pri-badge.média{color:#f0c040;border-color:#f0c04044}
+.pri-badge.baixa{color:#555;border-color:#33333}
+.obj-countdown{font-size:10px;font-family:monospace;margin-top:2px}
+.obj-methods-preview{font-size:10px;color:#444;margin-top:3px;font-family:monospace}
+.obj-header-right{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.obj-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.obj-arrow{color:#444;font-size:12px}
 
-    .obj-header { padding: 14px 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-    .obj-title { font-size: 15px; font-weight: 700; color: #f0ede6; margin-bottom: 3px; line-height: 1.3; }
-    .obj-title.empty { color: #333; font-style: italic; }
-    .obj-countdown { font-size: 10px; font-family: monospace; }
-    .obj-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .obj-arrow { color: #444; font-size: 12px; }
+/* BODY */
+.obj-body{border-top:1px solid #1e1e1e;display:none;background:#141414}
+.obj-body.open{display:block}
 
-    .obj-body { border-top: 1px solid #222; display: none; }
-    .obj-body.open { display: block; }
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid #1e1e1e;background:#111;overflow-x:auto}
+.tab-btn{flex:1;min-width:60px;background:transparent;border:none;border-bottom:2px solid transparent;color:#444;padding:9px 4px;font-size:8px;font-family:monospace;letter-spacing:.5px;cursor:pointer;text-transform:uppercase;white-space:nowrap}
+.tab-btn.active{background:#161616;border-bottom-color:#f0c040;color:#f0c040}
+.tab-pane{display:none;padding:14px}
+.tab-pane.active{display:block}
 
-    .tabs { display: flex; border-bottom: 1px solid #222; }
-    .tab-btn {
-      flex: 1; background: transparent; border: none; border-bottom: 2px solid transparent;
-      color: #444; padding: 8px 2px; font-size: 8px; font-family: monospace;
-      letter-spacing: 0.5px; cursor: pointer; text-transform: uppercase;
-    }
-    .tab-btn.active { background: #1f1f1f; border-bottom-color: #f0c040; color: #f0c040; }
+/* FIELDS */
+.field-label{display:block;font-size:9px;font-family:monospace;letter-spacing:2px;color:#555;text-transform:uppercase;margin-bottom:4px;margin-top:12px}
+.field-label:first-child{margin-top:0}
+.field-input{width:100%;background:#111;border:1px solid #252525;border-radius:4px;color:#f0ede6;font-size:13px;padding:8px 10px;outline:none}
+textarea.field-input{resize:vertical}
+select.field-input{cursor:pointer}
+.field-row{display:flex;gap:8px;align-items:flex-end}
+.field-row .field-input{flex:1}
 
-    .tab-content { padding: 14px 16px; display: none; }
-    .tab-content.active { display: block; }
+/* BUTTONS */
+.btn-del{background:none;border:1px solid #ff333344;color:#ff5555;border-radius:4px;padding:5px 12px;cursor:pointer;font-size:11px;font-family:monospace}
+.btn-add-sm{background:#f0c040;border:none;color:#000;border-radius:4px;padding:0 14px;cursor:pointer;font-size:18px;font-weight:700;flex-shrink:0;height:38px}
+.btn-x{background:none;border:none;color:#333;cursor:pointer;font-size:12px;padding:2px 4px;flex-shrink:0}
+.btn-x:hover{color:#ff5555}
+.add-row{display:flex;gap:6px;margin-top:10px}
+.add-row .field-input{flex:1}
 
-    label.field { display: block; font-size: 9px; font-family: monospace; letter-spacing: 2px; color: #555; text-transform: uppercase; margin-bottom: 4px; margin-top: 12px; }
-    label.field:first-child { margin-top: 0; }
-    .field-input {
-      width: 100%; background: #111; border: 1px solid #2a2a2a; border-radius: 4px;
-      color: #f0ede6; font-size: 13px; padding: 8px 10px; font-family: Georgia, serif; outline: none;
-    }
-    textarea.field-input { resize: vertical; }
+/* LIST ITEMS */
+.list-item{display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-bottom:1px solid #1a1a1a}
+.list-item:last-child{border-bottom:none}
+.check-box{width:16px;height:16px;border-radius:3px;border:1px solid #ff5555;background:transparent;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:#52c47e;margin-top:1px}
+.check-box.solved{border-color:#52c47e;background:#52c47e11}
+.item-text{flex:1;font-size:13px;color:#f0ede6;line-height:1.4}
+.item-text.solved{color:#333;text-decoration:line-through}
 
-    .btn-delete {
-      background: none; border: 1px solid #ff333344; color: #ff5555;
-      border-radius: 4px; padding: 5px 12px; cursor: pointer; font-size: 11px; font-family: monospace;
-      margin-top: 16px; float: right;
-    }
+/* TIMER */
+.timer-block{background:#111;border-radius:6px;padding:10px 12px;margin-bottom:8px;border-left:3px solid}
+.timer-label{font-size:9px;font-family:monospace;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;opacity:.85}
+.timer-units{display:flex;gap:8px;flex-wrap:wrap}
+.timer-unit{text-align:center;min-width:38px}
+.timer-val{font-family:monospace;font-weight:700;line-height:1}
+.timer-lbl{font-size:8px;color:#444;font-family:monospace;margin-top:2px}
+.timer-created{margin-top:10px;font-size:10px;color:#2a2a2a;font-family:monospace;letter-spacing:1px;text-align:center}
+.no-deadline-msg{font-size:11px;color:#444;font-style:italic;margin-top:8px}
 
-    .blockers-list, .resources-list { margin-bottom: 8px; }
-    .blocker-item, .resource-item { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
-    .check-box {
-      width: 14px; height: 14px; border-radius: 3px; border: 1px solid #ff5555;
-      background: transparent; cursor: pointer; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center; font-size: 9px; color: #52c47e;
-    }
-    .check-box.solved { border-color: #52c47e; background: #52c47e22; }
-    .blocker-text { flex: 1; font-size: 13px; color: #f0ede6; }
-    .blocker-text.solved { color: #444; text-decoration: line-through; }
-    .resource-dot { width: 6px; height: 6px; border-radius: 50%; background: #f0c040; flex-shrink: 0; }
-    .resource-text { flex: 1; font-size: 13px; color: #f0ede6; }
-    .btn-x { background: none; border: none; color: #333; cursor: pointer; font-size: 12px; padding: 0; flex-shrink: 0; }
+/* METHODS */
+.methods-section{margin-top:4px}
+.method-card{background:#111;border:1px solid #222;border-radius:6px;margin-bottom:10px;overflow:hidden}
+.method-header{padding:11px 12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.method-title{font-size:13px;font-weight:700;color:#f0ede6;flex:1}
+.method-title.empty{color:#333;font-style:italic}
+.method-meta{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.method-deadline{font-family:monospace;font-size:9px}
+.method-progress-bar{height:2px;background:#1a1a1a}
+.method-progress-fill{height:2px;background:#52c47e;transition:width .3s}
+.method-body{border-top:1px solid #1e1e1e;display:none;padding:12px}
+.method-body.open{display:block}
+.method-tabs{display:flex;gap:4px;margin-bottom:12px;overflow-x:auto}
+.method-tab{background:#1a1a1a;border:none;border-radius:3px;color:#444;padding:5px 10px;font-size:9px;font-family:monospace;letter-spacing:.5px;cursor:pointer;text-transform:uppercase;white-space:nowrap}
+.method-tab.active{background:#252525;color:#f0c040}
+.method-tab-pane{display:none}
+.method-tab-pane.active{display:block}
+.progress-input{width:100%;accent-color:#52c47e;cursor:pointer}
+.progress-display{font-family:monospace;font-size:11px;color:#52c47e;margin-top:4px}
+.note-block{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:4px;padding:8px 10px;font-size:12px;color:#888;margin-bottom:6px;line-height:1.5}
+.note-block .note-date{font-size:9px;color:#333;font-family:monospace;margin-bottom:4px}
+.tip-item,.prompt-item{background:#0d0d0d;border-left:2px solid;border-radius:0 4px 4px 0;padding:8px 10px;margin-bottom:6px;font-size:12px;color:#aaa;line-height:1.5;display:flex;gap:8px;align-items:flex-start}
+.tip-item{border-left-color:#f0c04066}
+.prompt-item{border-left-color:#7b6fff66}
 
-    .add-row { display: flex; gap: 6px; margin-top: 8px; }
-    .add-row .field-input { flex: 1; }
-    .btn-add {
-      background: #f0c040; border: none; color: #000; border-radius: 4px;
-      padding: 0 14px; cursor: pointer; font-size: 18px; font-weight: 700; flex-shrink: 0;
-    }
+/* REMINDER */
+.reminder-item{display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #1a1a1a}
+.reminder-item:last-child{border-bottom:none}
+.reminder-time{font-family:monospace;font-size:12px;color:#f0c040;flex-shrink:0}
+.reminder-msg{flex:1;font-size:12px;color:#888}
+.reminder-status{font-size:9px;font-family:monospace;color:#444}
 
-    .hint { font-size: 11px; color: #555; margin-bottom: 12px; font-style: italic; }
-
-    .timer-block { background: #111; border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; border-left: 3px solid; }
-    .timer-label { font-size: 9px; font-family: monospace; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; opacity: 0.8; }
-    .timer-units { display: flex; gap: 6px; flex-wrap: wrap; }
-    .timer-unit { text-align: center; min-width: 36px; }
-    .timer-val { font-family: monospace; font-weight: 700; line-height: 1; }
-    .timer-lbl { font-size: 8px; color: #444; font-family: monospace; margin-top: 2px; }
-    .timer-created { margin-top: 10px; font-size: 10px; color: #2a2a2a; font-family: monospace; letter-spacing: 1px; text-align: center; }
-    .no-deadline { font-size: 11px; color: #444; font-style: italic; margin-top: 8px; }
-  </style>
+/* HINT */
+.hint{font-size:11px;color:#444;margin-bottom:10px;font-style:italic;line-height:1.5}
+.section-actions{display:flex;justify-content:flex-end;margin-top:12px}
+</style>
 </head>
 <body>
-
 <div id="header">
-  <div class="sub">sistema de foco</div>
-  <div class="top">
+  <div class="header-sub">sistema de foco</div>
+  <div class="header-top">
     <h1>Meus Objetivos</h1>
-    <div class="date" id="date-display"></div>
+    <div class="header-date" id="date-display"></div>
   </div>
-  <div id="stats" style="display:none"></div>
+  <div id="stats"></div>
 </div>
 
 <div id="main">
-  <button id="btn-new">+ novo objetivo</button>
+  <button class="btn-new" id="btn-new">+ novo objetivo</button>
   <div id="empty">
     <div class="icon">◎</div>
-    <div class="label">NENHUM OBJETIVO AINDA</div>
+    <div class="lbl">NENHUM OBJETIVO AINDA</div>
     <div class="sub">O tempo tá passando de qualquer jeito.</div>
   </div>
   <div id="objectives-list"></div>
 </div>
 
 <script>
-const STORAGE_KEY = "foco-v2";
+const SK = "foco-v3";
+function load(){try{return JSON.parse(localStorage.getItem(SK))||[];}catch{return[];}}
+function save(d){try{localStorage.setItem(SK,JSON.stringify(d));}catch{}}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+function esc(s){return(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function pad(n){return String(n).padStart(2,"0");}
 
-function load() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { return []; }
+function splitMs(ms){
+  if(ms<0)ms=0;
+  return{y:Math.floor(ms/31536000000),mo:Math.floor(ms/2592000000)%12,d:Math.floor(ms/86400000)%30,h:Math.floor(ms/3600000)%24,m:Math.floor(ms/60000)%60,s:Math.floor(ms/1000)%60};
 }
-function save(data) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch {}
-}
-function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,5); }
-
-function splitTime(ms) {
-  if (ms < 0) ms = 0;
-  return {
-    y:  Math.floor(ms / 31536000000),
-    mo: Math.floor(ms / 2592000000) % 12,
-    d:  Math.floor(ms / 86400000) % 30,
-    h:  Math.floor(ms / 3600000) % 24,
-    m:  Math.floor(ms / 60000) % 60,
-    s:  Math.floor(ms / 1000) % 60,
-  };
+function fmtShort(ms){
+  const t=splitMs(ms);
+  return((t.y?t.y+"a ":"")+(t.mo?t.mo+"m ":"")+(t.d?t.d+"d ":"")+(t.h?t.h+"h ":"")+(t.m?t.m+"min ":"")+t.s+"s").trim();
 }
 
-function fmtFull(t) {
-  return ((t.y?t.y+"a ":"")+(t.mo?t.mo+"m ":"")+(t.d?t.d+"d ":"")+(t.h?t.h+"h ":"")+(t.m?t.m+"min ":"")+t.s+"s").trim();
+let data=load();
+let openObj=null;
+let openMethods={};// objId -> methodId
+let openMethodTabs={};// methodId -> tab
+let objTabs={};// objId -> tab
+let tickId=null;
+
+// Notifications
+let notifPermission=false;
+function requestNotif(){
+  if(!("Notification"in window))return;
+  Notification.requestPermission().then(p=>{notifPermission=p==="granted";});
 }
+requestNotif();
 
-function pad(n) { return String(n).padStart(2,"0"); }
+function scheduleReminders(){
+  // Check reminders every minute
+  setInterval(()=>{
+    const now=new Date();
+    const hhmm=pad(now.getHours())+":"+pad(now.getMinutes());
+    data.forEach(obj=>{
+      (obj.reminders||[]).forEach(r=>{
+        if(r.time===hhmm&&notifPermission){
+          new Notification("🎯 Foco — "+esc(obj.title||"Objetivo"),{body:r.msg||"Hora de focar!",icon:""});
+        }
+      });
+    });
+  },60000);
+}
+scheduleReminders();
 
-let objectives = load();
-let openId = null;
-let tickInterval = null;
+// ─── RENDER ──────────────────────────────────────────
+document.getElementById("date-display").textContent=
+  new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long"});
 
-// Date display
-document.getElementById("date-display").textContent =
-  new Date().toLocaleDateString("pt-BR", {weekday:"long", day:"numeric", month:"long"});
-
-document.getElementById("btn-new").onclick = () => {
-  const novo = { id: uid(), title: "", why: "", deadline: null, createdAt: Date.now(), blockers: [], resources: [] };
-  objectives.unshift(novo);
-  save(objectives);
-  openId = novo.id;
-  render();
+document.getElementById("btn-new").onclick=()=>{
+  const o={id:uid(),title:"",why:"",priority:"alta",deadline:null,createdAt:Date.now(),blockers:[],methods:[],reminders:[]};
+  data.unshift(o);save(data);openObj=o.id;objTabs[o.id]="geral";render();
 };
 
-function updateStats() {
-  const expired = objectives.filter(o => o.deadline && o.deadline < Date.now()).length;
-  const urgent  = objectives.filter(o => o.deadline && o.deadline > Date.now() && o.deadline - Date.now() < 86400000*3).length;
-  const statsEl = document.getElementById("stats");
-  if (objectives.length === 0) { statsEl.style.display = "none"; return; }
-  statsEl.style.display = "flex";
-  statsEl.innerHTML =
-    (expired ? `<span style="color:#ff3333">${expired} expirado${expired>1?"s":""}</span>` : "") +
-    (urgent  ? `<span style="color:#ff8800">${urgent} urgente${urgent>1?"s":""}</span>` : "") +
-    `<span style="color:#333">${objectives.length} total</span>`;
+function updateStats(){
+  const now=Date.now();
+  const expired=data.filter(o=>o.deadline&&o.deadline<now).length;
+  const urgent=data.filter(o=>o.deadline&&o.deadline>now&&o.deadline-now<86400000*3).length;
+  const el=document.getElementById("stats");
+  if(!data.length){el.innerHTML="";return;}
+  el.innerHTML=
+    (expired?`<span style="color:#ff3333">${expired} expirado${expired>1?"s":""}</span>`:"")+
+    (urgent?`<span style="color:#ff8800">${urgent} urgente${urgent>1?"s":""}</span>`:"")+
+    `<span style="color:#333">${data.length} total</span>`;
 }
 
-function renderTimerBlock(ms, label, color, urgent) {
-  const t = splitTime(ms);
-  const units = [
-    {v:t.y,l:"anos"},{v:t.mo,l:"meses"},{v:t.d,l:"dias"},
-    {v:t.h,l:"horas"},{v:t.m,l:"min"},{v:t.s,l:"seg"}
-  ];
-  const urgentIds = ["dias","horas"];
-  return `
-    <div class="timer-block" style="border-left-color:${color}; border-color:${color}22" data-timer-ms="${ms}" data-timer-color="${color}" data-timer-urgent="${urgent}" data-timer-label="${label}">
-      <div class="timer-label" style="color:${color}">${urgent?"⚠ ":""}${label}</div>
-      <div class="timer-units">
-        ${units.map(u => `
-          <div class="timer-unit">
-            <div class="timer-val" style="font-size:${u.l==="anos"||u.l==="meses"?18:u.l==="dias"?22:15}px;color:${urgent&&urgentIds.includes(u.l)?"#ff4444":color}">${pad(u.v)}</div>
-            <div class="timer-lbl">${u.l}</div>
-          </div>`).join("")}
+function timerBlockHtml(ms,label,color,urgent){
+  const t=splitMs(ms);
+  const units=[{v:t.y,l:"anos"},{v:t.mo,l:"meses"},{v:t.d,l:"dias"},{v:t.h,l:"horas"},{v:t.m,l:"min"},{v:t.s,l:"seg"}];
+  return`<div class="timer-block" style="border-left-color:${color};border-color:${color}22">
+    <div class="timer-label" style="color:${color}">${urgent?"⚠ ":""}${label}</div>
+    <div class="timer-units">
+      ${units.map(u=>`<div class="timer-unit">
+        <div class="timer-val" style="font-size:${u.l==="anos"||u.l==="meses"?18:u.l==="dias"?22:15}px;color:${urgent&&(u.l==="dias"||u.l==="horas")?"#ff4444":color}">${pad(u.v)}</div>
+        <div class="timer-lbl">${u.l}</div>
+      </div>`).join("")}
+    </div>
+  </div>`;
+}
+
+function methodCardHtml(m,objId){
+  const now=Date.now();
+  const remaining=m.deadline?m.deadline-now:null;
+  const isExp=remaining!==null&&remaining<0;
+  const isUrg=remaining!==null&&remaining>=0&&remaining<86400000*3;
+  const dColor=isExp?"#ff3333":isUrg?"#ff8800":"#555";
+  const isOpen=openMethods[objId]===m.id;
+  const activeTab=openMethodTabs[m.id]||"info";
+  const prog=m.progress||0;
+
+  // Info tab
+  const infoTab=`<div class="method-tab-pane ${activeTab==="info"?"active":""}" data-mtab="info">
+    <label class="field-label" style="margin-top:0">Título</label>
+    <input class="field-input" type="text" placeholder="Nome do método" value="${esc(m.title)}" data-mfield="title"/>
+    <label class="field-label">Prazo</label>
+    <input class="field-input" type="datetime-local" value="${m.deadline?new Date(m.deadline).toISOString().slice(0,16):""}" data-mfield="deadline"/>
+    <label class="field-label">Progresso</label>
+    <input type="range" min="0" max="100" value="${prog}" class="progress-input" data-mfield="progress" style="width:100%;margin-top:4px"/>
+    <div class="progress-display">${prog}% concluído</div>
+    <div class="section-actions"><button class="btn-del" data-del-method="${m.id}">remover método</button></div>
+  </div>`;
+
+  // Tips tab
+  const tipsHtml=(m.tips||[]).map(t=>`<div class="tip-item"><span style="flex:1">${esc(t.text)}</span><button class="btn-x" data-del-tip="${t.id}">✕</button></div>`).join("");
+  const tipsTab=`<div class="method-tab-pane ${activeTab==="dicas"?"active":""}" data-mtab="dicas">
+    <p class="hint">Dicas práticas que funcionam pra esse método.</p>
+    ${tipsHtml}
+    <div class="add-row">
+      <input class="field-input" type="text" placeholder="Adicionar dica..." data-new-tip/>
+      <button class="btn-add-sm" data-add-tip>+</button>
+    </div>
+  </div>`;
+
+  // Prompts tab
+  const promptsHtml=(m.prompts||[]).map(p=>`<div class="prompt-item"><span style="flex:1;font-family:monospace;font-size:11px">${esc(p.text)}</span><button class="btn-x" data-del-prompt="${p.id}">✕</button></div>`).join("");
+  const promptsTab=`<div class="method-tab-pane ${activeTab==="prompts"?"active":""}" data-mtab="prompts">
+    <p class="hint">Prompts de IA, scripts ou frases prontas pra usar.</p>
+    ${promptsHtml}
+    <div class="add-row">
+      <textarea class="field-input" rows="2" placeholder="Colar prompt aqui..." data-new-prompt></textarea>
+      <button class="btn-add-sm" data-add-prompt>+</button>
+    </div>
+  </div>`;
+
+  // Notes tab
+  const notesHtml=(m.notes||[]).map(n=>`<div class="note-block"><div class="note-date">${n.date}</div>${esc(n.text)}<div style="text-align:right;margin-top:4px"><button class="btn-x" data-del-note="${n.id}" style="font-size:10px">✕ remover</button></div></div>`).join("");
+  const notesTab=`<div class="method-tab-pane ${activeTab==="anotações"?"active":""}" data-mtab="anotações">
+    <p class="hint">Anotações livres, aprendizados, o que funcionou.</p>
+    ${notesHtml}
+    <div class="add-row">
+      <textarea class="field-input" rows="2" placeholder="Anotar algo..." data-new-note></textarea>
+      <button class="btn-add-sm" data-add-note>+</button>
+    </div>
+  </div>`;
+
+  return`<div class="method-card" data-method-id="${m.id}" data-obj-id="${objId}">
+    <div class="method-header" data-toggle-method="${m.id}">
+      <div style="flex:1;min-width:0">
+        <div class="method-title ${m.title?"":"empty"}">${m.title?esc(m.title):"sem título"}</div>
+        ${remaining!==null?`<div class="method-deadline" style="color:${dColor};font-family:monospace;font-size:9px;margin-top:2px">${isExp?"EXPIRADO":fmtShort(remaining)+" restando"}</div>`:""}
       </div>
-    </div>`;
+      <div class="method-meta">
+        <span style="font-family:monospace;font-size:10px;color:#52c47e">${prog}%</span>
+        <span class="obj-arrow">${isOpen?"▲":"▼"}</span>
+      </div>
+    </div>
+    <div class="method-progress-bar"><div class="method-progress-fill" style="width:${prog}%"></div></div>
+    <div class="method-body ${isOpen?"open":""}" data-method-body="${m.id}">
+      <div class="method-tabs">
+        ${[["info","◎ Info"],["dicas","💡 Dicas"],["prompts","⚡ Prompts"],["anotações","📝 Anotações"]].map(([t,l])=>
+          `<button class="method-tab ${activeTab===t?"active":""}" data-method-tab-btn="${t}">${l}</button>`
+        ).join("")}
+      </div>
+      ${infoTab}${tipsTab}${promptsTab}${notesTab}
+    </div>
+  </div>`;
 }
 
-function renderCard(obj) {
-  const now = Date.now();
-  const elapsed   = now - obj.createdAt;
-  const remaining = obj.deadline ? obj.deadline - now : null;
-  const isExpired = remaining !== null && remaining < 0;
-  const isUrgent  = remaining !== null && remaining >= 0 && remaining < 86400000*3;
-  const statusColor = isExpired ? "#ff3333" : isUrgent ? "#ff8800" : "#f0c040";
-  const isOpen = openId === obj.id;
+function renderCard(obj){
+  const now=Date.now();
+  const elapsed=now-obj.createdAt;
+  const remaining=obj.deadline?obj.deadline-now:null;
+  const isExp=remaining!==null&&remaining<0;
+  const isUrg=remaining!==null&&remaining>=0&&remaining<86400000*3;
+  const sColor=isExp?"#ff3333":isUrg?"#ff8800":"#f0c040";
+  const isOpen=openObj===obj.id;
+  const activeTab=objTabs[obj.id]||"geral";
 
-  let countdownHtml = "";
-  if (obj.deadline) {
-    if (isExpired) countdownHtml = `<div class="obj-countdown" style="color:#ff3333">EXPIRADO — ${fmtFull(splitTime(Math.abs(remaining)))} atrasado</div>`;
-    else countdownHtml = `<div class="obj-countdown" style="color:${statusColor}">${fmtFull(splitTime(remaining))} restando</div>`;
+  // Sort methods by deadline ascending
+  const methods=[...(obj.methods||[])].sort((a,b)=>{
+    const ra=a.deadline?a.deadline-now:Infinity;
+    const rb=b.deadline?b.deadline-now:Infinity;
+    return ra-rb;
+  });
+
+  let cdHtml="";
+  if(obj.deadline){
+    if(isExp)cdHtml=`<div class="obj-countdown" style="color:#ff3333">EXPIRADO — ${fmtShort(Math.abs(remaining))} atrasado</div>`;
+    else cdHtml=`<div class="obj-countdown" style="color:${sColor}">${fmtShort(remaining)} restando</div>`;
   }
+  const methodsCount=methods.length;
+  const methodsDone=methods.filter(m=>(m.progress||0)>=100).length;
 
-  // Tab: geral
-  const deadlineVal = obj.deadline ? new Date(obj.deadline).toISOString().slice(0,16) : "";
-  const tabGeral = `
-    <div class="tab-content ${isOpen && getOpenTab(obj.id)==="geral"?"active":""}" data-tab="geral">
-      <label class="field">Título</label>
-      <input class="field-input" type="text" placeholder="Nome do objetivo" value="${escHtml(obj.title)}" data-field="title" />
-      <label class="field">Por que isso importa?</label>
-      <textarea class="field-input" placeholder="Escreva o motivo real. Seja honesto." rows="3" data-field="why">${escHtml(obj.why)}</textarea>
-      <label class="field">Prazo (deadline)</label>
-      <input class="field-input" type="datetime-local" value="${deadlineVal}" data-field="deadline" />
-      <div style="overflow:hidden"><button class="btn-delete" data-delete="${obj.id}">deletar objetivo</button></div>
-    </div>`;
+  // TAB: GERAL
+  const tabGeral=`<div class="tab-pane ${activeTab==="geral"?"active":""}" data-tab="geral">
+    <label class="field-label" style="margin-top:0">Título</label>
+    <input class="field-input" type="text" placeholder="Nome do objetivo" value="${esc(obj.title)}" data-field="title"/>
+    <label class="field-label">Por que isso importa?</label>
+    <textarea class="field-input" rows="3" placeholder="Escreva o motivo real." data-field="why">${esc(obj.why)}</textarea>
+    <label class="field-label">Prioridade</label>
+    <select class="field-input" data-field="priority">
+      <option value="alta" ${obj.priority==="alta"?"selected":""}>🔴 Alta</option>
+      <option value="média" ${obj.priority==="média"?"selected":""}>🟡 Média</option>
+      <option value="baixa" ${obj.priority==="baixa"?"selected":""}>⚪ Baixa</option>
+    </select>
+    <label class="field-label">Prazo (deadline)</label>
+    <input class="field-input" type="datetime-local" value="${obj.deadline?new Date(obj.deadline).toISOString().slice(0,16):""}" data-field="deadline"/>
+    <div class="section-actions"><button class="btn-del" data-delete="${obj.id}">deletar objetivo</button></div>
+  </div>`;
 
-  // Tab: bloqueios
-  const blockersHtml = (obj.blockers||[]).map(b => `
-    <div class="blocker-item">
-      <div class="check-box ${b.solved?"solved":""}" data-toggle-blocker="${b.id}">✓</div>
-      <span class="blocker-text ${b.solved?"solved":""}">${escHtml(b.text)}</span>
-      <button class="btn-x" data-remove-blocker="${b.id}">✕</button>
-    </div>`).join("");
-  const tabBlockers = `
-    <div class="tab-content ${isOpen && getOpenTab(obj.id)==="bloqueios"?"active":""}" data-tab="bloqueios">
-      <p class="hint">O que tá te impedindo de avançar? Nomeie. Enfrente.</p>
-      <div class="blockers-list">${blockersHtml}</div>
-      <div class="add-row">
-        <input class="field-input" type="text" placeholder="Adicionar bloqueio..." data-new-blocker />
-        <button class="btn-add" data-add-blocker>+</button>
-      </div>
-    </div>`;
+  // TAB: MÉTODOS
+  const tabMetodos=`<div class="tab-pane ${activeTab==="métodos"?"active":""}" data-tab="métodos">
+    <p class="hint">Métodos ordenados pelo prazo mais próximo.</p>
+    <div class="methods-section" data-methods-of="${obj.id}">
+      ${methods.map(m=>methodCardHtml(m,obj.id)).join("")}
+    </div>
+    <button class="btn-new" style="margin-top:4px;margin-bottom:0;font-size:11px;padding:9px" data-add-method="${obj.id}">+ novo método</button>
+  </div>`;
 
-  // Tab: recursos
-  const resourcesHtml = (obj.resources||[]).map(r => `
-    <div class="resource-item">
-      <div class="resource-dot"></div>
-      <span class="resource-text">${escHtml(r.text)}</span>
-      <button class="btn-x" data-remove-resource="${r.id}">✕</button>
-    </div>`).join("");
-  const tabResources = `
-    <div class="tab-content ${isOpen && getOpenTab(obj.id)==="recursos"?"active":""}" data-tab="recursos">
-      <p class="hint">O que você PRECISA pra concluir esse objetivo?</p>
-      <div class="resources-list">${resourcesHtml}</div>
-      <div class="add-row">
-        <input class="field-input" type="text" placeholder="Ex: aprender X, comprar Y, falar com Z..." data-new-resource />
-        <button class="btn-add" data-add-resource>+</button>
-      </div>
-    </div>`;
+  // TAB: BLOQUEIOS
+  const blockersHtml=(obj.blockers||[]).map(b=>`<div class="list-item">
+    <div class="check-box ${b.solved?"solved":""}" data-toggle-blocker="${b.id}">✓</div>
+    <span class="item-text ${b.solved?"solved":""}">${esc(b.text)}</span>
+    <button class="btn-x" data-del-blocker="${b.id}">✕</button>
+  </div>`).join("");
+  const tabBlockers=`<div class="tab-pane ${activeTab==="bloqueios"?"active":""}" data-tab="bloqueios">
+    <p class="hint">O que tá te impedindo? Nomeie. Enfrente.</p>
+    ${blockersHtml}
+    <div class="add-row">
+      <input class="field-input" type="text" placeholder="Adicionar bloqueio..." data-new-blocker/>
+      <button class="btn-add-sm" data-add-blocker>+</button>
+    </div>
+  </div>`;
 
-  // Tab: cronômetro
-  let timerContent = renderTimerBlock(elapsed, "tempo que já foi embora desde que você criou isso", "#666", false);
-  if (obj.deadline) {
-    if (isExpired) timerContent += renderTimerBlock(Math.abs(remaining), "tempo que você deixou passar do prazo", "#ff3333", true);
-    else timerContent += renderTimerBlock(remaining, "tempo que ainda resta — use bem", isUrgent?"#ff8800":"#f0c040", isUrgent);
-  } else {
-    timerContent += `<div class="no-deadline">Defina um prazo na aba "geral" pra ver o contador regressivo.</div>`;
+  // TAB: LEMBRETES
+  const remindersHtml=(obj.reminders||[]).map(r=>`<div class="reminder-item">
+    <span class="reminder-time">${r.time}</span>
+    <span class="reminder-msg">${esc(r.msg)}</span>
+    <button class="btn-x" data-del-reminder="${r.id}">✕</button>
+  </div>`).join("");
+  const notifNote=!("Notification"in window)?"<p class='hint' style='color:#ff5555'>Seu navegador não suporta notificações.</p>":
+    notifPermission?"":"<p class='hint' style='color:#ff8800'>Ative as notificações do navegador pra receber lembretes.</p>";
+  const tabLembretes=`<div class="tab-pane ${activeTab==="lembretes"?"active":""}" data-tab="lembretes">
+    ${notifNote}
+    <p class="hint">O lembrete vai aparecer todo dia nesse horário enquanto o app estiver aberto.</p>
+    ${remindersHtml}
+    <label class="field-label" style="margin-top:8px">Horário</label>
+    <input class="field-input" type="time" data-new-reminder-time style="margin-bottom:8px"/>
+    <label class="field-label">Mensagem</label>
+    <input class="field-input" type="text" placeholder="Ex: Vai lá, não para agora!" data-new-reminder-msg/>
+    <div class="add-row" style="margin-top:8px">
+      <button class="btn-new" style="margin:0;font-size:11px;padding:9px" data-add-reminder="${obj.id}">+ adicionar lembrete</button>
+    </div>
+  </div>`;
+
+  // TAB: CRONÔMETRO
+  let timerHtml=timerBlockHtml(elapsed,"tempo perdido desde que você criou","#555",false);
+  if(obj.deadline){
+    if(isExp)timerHtml+=timerBlockHtml(Math.abs(remaining),"tempo que você deixou passar do prazo","#ff3333",true);
+    else timerHtml+=timerBlockHtml(remaining,"tempo que ainda resta — use bem",isUrg?"#ff8800":"#f0c040",isUrg);
+  }else{
+    timerHtml+=`<div class="no-deadline-msg">Defina um prazo na aba "geral" pra ver o contador regressivo.</div>`;
   }
-  const tabTimer = `
-    <div class="tab-content ${isOpen && getOpenTab(obj.id)==="cronômetro"?"active":""}" data-tab="cronômetro" data-obj-id="${obj.id}">
-      ${timerContent}
-      <div class="timer-created">CRIADO EM ${new Date(obj.createdAt).toLocaleDateString("pt-BR")}</div>
-    </div>`;
+  const tabTimer=`<div class="tab-pane ${activeTab==="cronômetro"?"active":""}" data-tab="cronômetro" data-timer-obj="${obj.id}">
+    ${timerHtml}
+    <div class="timer-created">CRIADO EM ${new Date(obj.createdAt).toLocaleDateString("pt-BR")}</div>
+  </div>`;
 
-  return `
-    <div class="obj-card ${isExpired?"expired":isUrgent?"urgent":""}" data-obj-id="${obj.id}">
-      <div class="obj-header" data-toggle="${obj.id}">
-        <div style="flex:1">
-          <div class="obj-title ${obj.title?"":"empty"}">${obj.title ? escHtml(obj.title) : "sem título"}</div>
-          ${countdownHtml}
+  const priClass=obj.priority||"alta";
+  return`<div class="obj-card pri-${priClass} ${isExp?"expired":isUrg?"urgent":""}" data-obj-id="${obj.id}">
+    <div class="obj-header" data-toggle="${obj.id}">
+      <div class="obj-header-left">
+        <div class="obj-title-row">
+          <div class="obj-title ${obj.title?"":"empty"}">${obj.title?esc(obj.title):"sem título"}</div>
+          <span class="pri-badge ${priClass}">${priClass}</span>
         </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <div class="obj-dot" style="background:${statusColor};box-shadow:0 0 6px ${statusColor}66"></div>
-          <span class="obj-arrow">${isOpen?"▲":"▼"}</span>
-        </div>
+        ${cdHtml}
+        ${methodsCount?`<div class="obj-methods-preview">${methodsDone}/${methodsCount} métodos concluídos</div>`:""}
       </div>
-      <div class="obj-body ${isOpen?"open":""}">
-        <div class="tabs">
-          ${[["geral","◎"],["bloqueios","⚡"],["recursos","🔧"],["cronômetro","⏱"]].map(([t,ic]) =>
-            `<button class="tab-btn ${isOpen && getOpenTab(obj.id)===t?"active":""}" data-tab-btn="${t}" data-obj="${obj.id}">${ic} ${t}</button>`
-          ).join("")}
-        </div>
-        ${tabGeral}${tabBlockers}${tabResources}${tabTimer}
+      <div class="obj-header-right">
+        <div class="obj-dot" style="background:${sColor};box-shadow:0 0 6px ${sColor}66"></div>
+        <span class="obj-arrow">${isOpen?"▲":"▼"}</span>
       </div>
-    </div>`;
+    </div>
+    <div class="obj-body ${isOpen?"open":""}" data-obj-body="${obj.id}">
+      <div class="tabs">
+        ${[["geral","◎"],["métodos","⚙"],["bloqueios","⚡"],["lembretes","🔔"],["cronômetro","⏱"]].map(([t,ic])=>
+          `<button class="tab-btn ${activeTab===t?"active":""}" data-tab-btn="${t}" data-for-obj="${obj.id}">${ic} ${t}</button>`
+        ).join("")}
+      </div>
+      ${tabGeral}${tabMetodos}${tabBlockers}${tabLembretes}${tabTimer}
+    </div>
+  </div>`;
 }
 
-// Track open tab per objective
-const openTabs = {};
-function getOpenTab(id) { return openTabs[id] || "geral"; }
-
-function render() {
+function render(){
   updateStats();
-  const sorted = [...objectives].sort((a,b) => {
-    const ra = a.deadline ? a.deadline - Date.now() : Infinity;
-    const rb = b.deadline ? b.deadline - Date.now() : Infinity;
-    return ra - rb;
+  const sorted=[...data].sort((a,b)=>{
+    const po={alta:0,média:1,baixa:2};
+    const pd=(po[a.priority]??1)-(po[b.priority]??1);
+    if(pd!==0)return pd;
+    const ra=a.deadline?a.deadline-Date.now():Infinity;
+    const rb=b.deadline?b.deadline-Date.now():Infinity;
+    return ra-rb;
   });
-  document.getElementById("empty").style.display = objectives.length === 0 ? "block" : "none";
-  document.getElementById("objectives-list").innerHTML = sorted.map(renderCard).join("");
+  const el=document.getElementById("objectives-list");
+  document.getElementById("empty").style.display=data.length===0?"block":"none";
+  el.innerHTML=sorted.map(renderCard).join("");
   attachEvents();
-  startTick();
+  restartTick();
 }
 
-function attachEvents() {
-  // Toggle open/close
-  document.querySelectorAll("[data-toggle]").forEach(el => {
-    el.onclick = () => {
-      const id = el.dataset.toggle;
-      openId = openId === id ? null : id;
-      render();
-    };
+function getObj(id){return data.find(o=>o.id===id);}
+function getMethod(obj,mid){return(obj.methods||[]).find(m=>m.id===mid);}
+
+function attachEvents(){
+  // Toggle objective
+  document.querySelectorAll("[data-toggle]").forEach(el=>{
+    el.onclick=()=>{const id=el.dataset.toggle;openObj=openObj===id?null:id;if(openObj===id&&!objTabs[id])objTabs[id]="geral";render();};
   });
 
-  // Tab buttons
-  document.querySelectorAll("[data-tab-btn]").forEach(el => {
-    el.onclick = (e) => {
+  // Obj tab buttons
+  document.querySelectorAll("[data-tab-btn]").forEach(el=>{
+    el.onclick=(e)=>{
       e.stopPropagation();
-      const objId = el.dataset.obj;
-      const tab = el.dataset.tabBtn;
-      openTabs[objId] = tab;
-      // Update active tab UI without full re-render
-      const card = el.closest(".obj-card");
-      card.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tabBtn === tab));
-      card.querySelectorAll(".tab-content").forEach(c => c.classList.toggle("active", c.dataset.tab === tab));
+      const objId=el.dataset.forObj;const tab=el.dataset.tabBtn;
+      objTabs[objId]=tab;
+      const card=el.closest(".obj-card");
+      card.querySelectorAll(".tab-btn").forEach(b=>b.classList.toggle("active",b.dataset.tabBtn===tab));
+      card.querySelectorAll(".tab-pane").forEach(p=>p.classList.toggle("active",p.dataset.tab===tab));
     };
   });
 
-  // Field changes
-  document.querySelectorAll("[data-field]").forEach(el => {
-    el.oninput = () => {
-      const card = el.closest(".obj-card");
-      const id = card.dataset.objId;
-      const obj = objectives.find(o => o.id === id);
-      if (!obj) return;
-      const field = el.dataset.field;
-      if (field === "deadline") {
-        obj.deadline = el.value ? new Date(el.value).getTime() : null;
-      } else {
-        obj[field] = el.value;
-      }
-      save(objectives);
-      // Update title in header without full re-render
-      const titleEl = card.querySelector(".obj-title");
-      if (field === "title") {
-        titleEl.textContent = el.value || "sem título";
-        titleEl.classList.toggle("empty", !el.value);
-      }
-      updateStats();
+  // Obj field changes
+  document.querySelectorAll("[data-field]").forEach(el=>{
+    el.oninput=()=>{
+      const card=el.closest(".obj-card");const id=card.dataset.objId;const obj=getObj(id);if(!obj)return;
+      const f=el.dataset.field;
+      if(f==="deadline")obj.deadline=el.value?new Date(el.value).getTime():null;
+      else obj[f]=el.value;
+      save(data);updateStats();
+      if(f==="title"){const t=card.querySelector(".obj-title");t.textContent=el.value||"sem título";t.classList.toggle("empty",!el.value);}
+      if(f==="priority"){card.className=card.className.replace(/pri-\w+/,"pri-"+(el.value||"alta"));}
     };
   });
 
   // Delete objective
-  document.querySelectorAll("[data-delete]").forEach(el => {
-    el.onclick = () => {
-      const id = el.dataset.delete;
-      objectives = objectives.filter(o => o.id !== id);
-      if (openId === id) openId = null;
-      save(objectives);
-      render();
+  document.querySelectorAll("[data-delete]").forEach(el=>{
+    el.onclick=()=>{const id=el.dataset.delete;data=data.filter(o=>o.id!==id);if(openObj===id)openObj=null;save(data);render();};
+  });
+
+  // Add method
+  document.querySelectorAll("[data-add-method]").forEach(el=>{
+    el.onclick=()=>{
+      const objId=el.dataset.addMethod;const obj=getObj(objId);if(!obj)return;
+      const m={id:uid(),title:"",deadline:null,progress:0,tips:[],prompts:[],notes:[]};
+      obj.methods=obj.methods||[];obj.methods.push(m);
+      save(data);openMethods[objId]=m.id;openMethodTabs[m.id]="info";objTabs[objId]="métodos";render();
     };
   });
 
-  // Add blocker
-  document.querySelectorAll("[data-add-blocker]").forEach(el => {
-    el.onclick = () => {
-      const card = el.closest(".obj-card");
-      const id = card.dataset.objId;
-      const input = card.querySelector("[data-new-blocker]");
-      if (!input.value.trim()) return;
-      const obj = objectives.find(o => o.id === id);
-      if (!obj) return;
-      obj.blockers = obj.blockers || [];
-      obj.blockers.push({ id: uid(), text: input.value.trim(), solved: false });
-      save(objectives);
-      openTabs[id] = "bloqueios";
-      render();
+  // Toggle method
+  document.querySelectorAll("[data-toggle-method]").forEach(el=>{
+    el.onclick=(e)=>{
+      e.stopPropagation();
+      const mid=el.dataset.toggleMethod;const card=el.closest(".obj-card");const objId=card.dataset.objId;
+      openMethods[objId]=openMethods[objId]===mid?null:mid;
+      if(openMethods[objId]&&!openMethodTabs[mid])openMethodTabs[mid]="info";
+      objTabs[objId]="métodos";render();
     };
   });
 
-  document.querySelectorAll("[data-new-blocker]").forEach(el => {
-    el.onkeydown = (e) => { if (e.key === "Enter") el.closest(".obj-card").querySelector("[data-add-blocker]").click(); };
-  });
-
-  // Toggle blocker
-  document.querySelectorAll("[data-toggle-blocker]").forEach(el => {
-    el.onclick = () => {
-      const card = el.closest(".obj-card");
-      const id = card.dataset.objId;
-      const bid = el.dataset.toggleBlocker;
-      const obj = objectives.find(o => o.id === id);
-      if (!obj) return;
-      const b = obj.blockers.find(b => b.id === bid);
-      if (b) b.solved = !b.solved;
-      save(objectives);
-      openTabs[id] = "bloqueios";
-      render();
+  // Method tab buttons
+  document.querySelectorAll("[data-method-tab-btn]").forEach(el=>{
+    el.onclick=(e)=>{
+      e.stopPropagation();
+      const tab=el.dataset.methodTabBtn;const mc=el.closest(".method-card");const mid=mc.dataset.methodId;
+      openMethodTabs[mid]=tab;
+      mc.querySelectorAll(".method-tab").forEach(b=>b.classList.toggle("active",b.dataset.methodTabBtn===tab));
+      mc.querySelectorAll(".method-tab-pane").forEach(p=>p.classList.toggle("active",p.dataset.mtab===tab));
     };
   });
 
-  // Remove blocker
-  document.querySelectorAll("[data-remove-blocker]").forEach(el => {
-    el.onclick = () => {
-      const card = el.closest(".obj-card");
-      const id = card.dataset.objId;
-      const bid = el.dataset.removeBlocker;
-      const obj = objectives.find(o => o.id === id);
-      if (!obj) return;
-      obj.blockers = obj.blockers.filter(b => b.id !== bid);
-      save(objectives);
-      openTabs[id] = "bloqueios";
-      render();
+  // Method fields
+  document.querySelectorAll("[data-mfield]").forEach(el=>{
+    el.oninput=()=>{
+      const mc=el.closest(".method-card");const mid=mc.dataset.methodId;const objId=mc.dataset.objId;
+      const obj=getObj(objId);if(!obj)return;const m=getMethod(obj,mid);if(!m)return;
+      const f=el.dataset.mfield;
+      if(f==="deadline")m.deadline=el.value?new Date(el.value).getTime():null;
+      else if(f==="progress"){m.progress=parseInt(el.value)||0;mc.querySelector(".progress-display").textContent=m.progress+"% concluído";mc.querySelector(".method-progress-fill").style.width=m.progress+"%";}
+      else m[f]=el.value;
+      save(data);
+      if(f==="title"){const t=mc.querySelector(".method-title");t.textContent=el.value||"sem título";t.classList.toggle("empty",!el.value);}
     };
   });
 
-  // Add resource
-  document.querySelectorAll("[data-add-resource]").forEach(el => {
-    el.onclick = () => {
-      const card = el.closest(".obj-card");
-      const id = card.dataset.objId;
-      const input = card.querySelector("[data-new-resource]");
-      if (!input.value.trim()) return;
-      const obj = objectives.find(o => o.id === id);
-      if (!obj) return;
-      obj.resources = obj.resources || [];
-      obj.resources.push({ id: uid(), text: input.value.trim() });
-      save(objectives);
-      openTabs[id] = "recursos";
-      render();
+  // Delete method
+  document.querySelectorAll("[data-del-method]").forEach(el=>{
+    el.onclick=(e)=>{
+      e.stopPropagation();
+      const mid=el.dataset.delMethod;const mc=el.closest(".method-card");const objId=mc.dataset.objId;
+      const obj=getObj(objId);if(!obj)return;
+      obj.methods=obj.methods.filter(m=>m.id!==mid);
+      if(openMethods[objId]===mid)openMethods[objId]=null;
+      save(data);objTabs[objId]="métodos";render();
     };
   });
 
-  document.querySelectorAll("[data-new-resource]").forEach(el => {
-    el.onkeydown = (e) => { if (e.key === "Enter") el.closest(".obj-card").querySelector("[data-add-resource]").click(); };
+  // Add tip
+  document.querySelectorAll("[data-add-tip]").forEach(el=>{
+    el.onclick=(e)=>{
+      e.stopPropagation();
+      const mc=el.closest(".method-card");const mid=mc.dataset.methodId;const objId=mc.dataset.objId;
+      const input=mc.querySelector("[data-new-tip]");if(!input.value.trim())return;
+      const obj=getObj(objId);if(!obj)return;const m=getMethod(obj,mid);if(!m)return;
+      m.tips=m.tips||[];m.tips.push({id:uid(),text:input.value.trim()});
+      save(data);openMethodTabs[mid]="dicas";objTabs[objId]="métodos";render();
+    };
+  });
+  document.querySelectorAll("[data-new-tip]").forEach(el=>{el.onkeydown=e=>{if(e.key==="Enter")el.closest(".method-card").querySelector("[data-add-tip]").click();};});
+
+  // Del tip
+  document.querySelectorAll("[data-del-tip]").forEach(el=>{
+    el.onclick=(e)=>{
+      e.stopPropagation();
+      const tid=el.dataset.delTip;const mc=el.closest(".method-card");const mid=mc.dataset.methodId;const objId=mc.dataset.objId;
+      const obj=getObj(objId);if(!obj)return;const m=getMethod(obj,mid);if(!m)return;
+      m.tips=m.tips.filter(t=>t.id!==tid);save(data);openMethodTabs[mid]="dicas";objTabs[objId]="métodos";render();
+    };
   });
 
-  // Remove resource
-  document.querySelectorAll("[data-remove-resource]").forEach(el => {
-    el.onclick = () => {
-      const card = el.closest(".obj-card");
-      const id = card.dataset.objId;
-      const rid = el.dataset.removeResource;
-      const obj = objectives.find(o => o.id === id);
-      if (!obj) return;
-      obj.resources = obj.resources.filter(r => r.id !== rid);
-      save(objectives);
-      openTabs[id] = "recursos";
+  // Add prompt
+  document.querySelectorAll("[data-add-prompt]").forEach(el=>{
+    el.onclick=(e)=>{
+      e.stopPropagation();
+      const mc=el.closest(".method-card");const mid=mc.dataset.methodId;const objId=mc.dataset.objId;
+      const input=mc.querySelector("[data-new-prompt]");if(!input.value.trim())return;
+      const obj=getObj(objId);if(!obj)return;const m=getMethod(obj,mid);if(!m)return;
+      m.prompts=m.prompts||[];m.prompts.push({id:uid(),text:input.value.trim()});
+      save(data);openMethodTabs[mid]="prompts";objTabs[objId]="métodos";render();
+    };
+  });
+
+  // Del prompt
+  document.querySelectorAll("[data-del-prompt]").forEach(el=>{
+    el.onclick=(e)=>{
+      e.stopPropagation();
+      const pid=el.dataset.delPrompt;const mc=el.closest(".method-card");const mid=mc.dataset.methodId;const objId=mc.dataset.objId;
+      const obj=getObj(objId);if(!obj)return;const m=getMethod(obj,mid);if(!m)return;
+      m.prompts=m.prompts.filter(p=>p.id!==pid);save(data);openMethodTabs[mid]="prompts";objTabs[objId]="métodos";render();
+    };
+  });
+
+  // Add note
+  document.querySelectorAll("[data-add-note]").forEach(el=>{
+    el.onclick=(e)=>{
+      e.stopPropagation();
+      const mc=el.closest(".method-card");const mid=mc.dataset.methodId;const objId=mc.dataset.objId;
+      const input=mc.querySelector("[data-new-note]");if(!input.value.trim())return;
+      const obj=getObj(objId);if(!obj)return;const m=getMethod(obj,mid);if(!m)return;
+      m.notes=m.notes||[];m.notes.unshift({id:uid(),text:input.value.trim(),date:new Date().toLocaleDateString("pt-BR")});
+      save(data);openMethodTabs[mid]="anotações";objTabs[objId]="métodos";render();
+    };
+  });
+
+  // Del note
+  document.querySelectorAll("[data-del-note]").forEach(el=>{
+    el.onclick=(e)=>{
+      e.stopPropagation();
+      const nid=el.dataset.delNote;const mc=el.closest(".method-card");const mid=mc.dataset.methodId;const objId=mc.dataset.objId;
+      const obj=getObj(objId);if(!obj)return;const m=getMethod(obj,mid);if(!m)return;
+      m.notes=m.notes.filter(n=>n.id!==nid);save(data);openMethodTabs[mid]="anotações";objTabs[objId]="métodos";render();
+    };
+  });
+
+  // Blockers
+  document.querySelectorAll("[data-add-blocker]").forEach(el=>{
+    el.onclick=()=>{
+      const card=el.closest(".obj-card");const id=card.dataset.objId;const input=card.querySelector("[data-new-blocker]");
+      if(!input.value.trim())return;const obj=getObj(id);if(!obj)return;
+      obj.blockers=obj.blockers||[];obj.blockers.push({id:uid(),text:input.value.trim(),solved:false});
+      save(data);objTabs[id]="bloqueios";render();
+    };
+  });
+  document.querySelectorAll("[data-new-blocker]").forEach(el=>{el.onkeydown=e=>{if(e.key==="Enter")el.closest(".obj-card").querySelector("[data-add-blocker]").click();};});
+  document.querySelectorAll("[data-toggle-blocker]").forEach(el=>{
+    el.onclick=()=>{
+      const bid=el.dataset.toggleBlocker;const card=el.closest(".obj-card");const id=card.dataset.objId;
+      const obj=getObj(id);if(!obj)return;const b=obj.blockers.find(x=>x.id===bid);if(b)b.solved=!b.solved;
+      save(data);objTabs[id]="bloqueios";render();
+    };
+  });
+  document.querySelectorAll("[data-del-blocker]").forEach(el=>{
+    el.onclick=()=>{
+      const bid=el.dataset.delBlocker;const card=el.closest(".obj-card");const id=card.dataset.objId;
+      const obj=getObj(id);if(!obj)return;obj.blockers=obj.blockers.filter(b=>b.id!==bid);
+      save(data);objTabs[id]="bloqueios";render();
+    };
+  });
+
+  // Reminders
+  document.querySelectorAll("[data-add-reminder]").forEach(el=>{
+    el.onclick=()=>{
+      const card=el.closest(".obj-card");const id=card.dataset.objId;
+      const timeEl=card.querySelector("[data-new-reminder-time]");
+      const msgEl=card.querySelector("[data-new-reminder-msg]");
+      if(!timeEl.value)return;
+      const obj=getObj(id);if(!obj)return;
+      obj.reminders=obj.reminders||[];
+      obj.reminders.push({id:uid(),time:timeEl.value,msg:msgEl.value.trim()||"Hora de focar!"});
+      save(data);objTabs[id]="lembretes";
+      if(!notifPermission)Notification.requestPermission().then(p=>{notifPermission=p==="granted";});
       render();
+    };
+  });
+  document.querySelectorAll("[data-del-reminder]").forEach(el=>{
+    el.onclick=()=>{
+      const rid=el.dataset.delReminder;const card=el.closest(".obj-card");const id=card.dataset.objId;
+      const obj=getObj(id);if(!obj)return;obj.reminders=obj.reminders.filter(r=>r.id!==rid);
+      save(data);objTabs[id]="lembretes";render();
     };
   });
 }
 
-function startTick() {
-  if (tickInterval) clearInterval(tickInterval);
-  tickInterval = setInterval(tick, 1000);
+// ─── TICK ────────────────────────────────────────────
+function restartTick(){
+  if(tickId)clearInterval(tickId);
+  tickId=setInterval(tick,1000);
 }
 
-function tick() {
+function tick(){
   updateStats();
-  // Update countdowns in headers
-  document.querySelectorAll(".obj-card").forEach(card => {
-    const id = card.dataset.objId;
-    const obj = objectives.find(o => o.id === id);
-    if (!obj) return;
-    const now = Date.now();
-    const remaining = obj.deadline ? obj.deadline - now : null;
-    const isExpired = remaining !== null && remaining < 0;
-    const isUrgent  = remaining !== null && remaining >= 0 && remaining < 86400000*3;
-    const statusColor = isExpired ? "#ff3333" : isUrgent ? "#ff8800" : "#f0c040";
-    const cdEl = card.querySelector(".obj-countdown");
-    if (cdEl && obj.deadline) {
-      if (isExpired) cdEl.textContent = `EXPIRADO — ${fmtFull(splitTime(Math.abs(remaining)))} atrasado`;
-      else cdEl.textContent = `${fmtFull(splitTime(remaining))} restando`;
-      cdEl.style.color = statusColor;
+  document.querySelectorAll(".obj-card").forEach(card=>{
+    const id=card.dataset.objId;const obj=getObj(id);if(!obj)return;
+    const now=Date.now();
+    const remaining=obj.deadline?obj.deadline-now:null;
+    const isExp=remaining!==null&&remaining<0;
+    const isUrg=remaining!==null&&remaining>=0&&remaining<86400000*3;
+    const sColor=isExp?"#ff3333":isUrg?"#ff8800":"#f0c040";
+    const cdEl=card.querySelector(".obj-countdown");
+    if(cdEl&&obj.deadline){
+      cdEl.textContent=isExp?`EXPIRADO — ${fmtShort(Math.abs(remaining))} atrasado`:`${fmtShort(remaining)} restando`;
+      cdEl.style.color=sColor;
     }
-    // Update timer tab if open
-    const timerTab = card.querySelector(".tab-content[data-tab='cronômetro']");
-    if (timerTab && timerTab.classList.contains("active")) {
-      const elapsed = now - obj.createdAt;
-      const blocks = timerTab.querySelectorAll(".timer-block");
-      // Elapsed block
-      if (blocks[0]) updateTimerBlock(blocks[0], elapsed);
-      // Remaining/expired block
-      if (blocks[1] && obj.deadline) {
-        if (isExpired) updateTimerBlock(blocks[1], Math.abs(remaining));
-        else updateTimerBlock(blocks[1], remaining);
-      }
+    // Timer tab
+    const timerPane=card.querySelector(".tab-pane[data-tab='cronômetro']");
+    if(timerPane&&timerPane.classList.contains("active")){
+      const elapsed=now-obj.createdAt;
+      const blocks=timerPane.querySelectorAll(".timer-block");
+      if(blocks[0])updateTimerBlock(blocks[0],elapsed);
+      if(blocks[1]&&obj.deadline)updateTimerBlock(blocks[1],isExp?Math.abs(remaining):remaining);
     }
   });
 }
 
-function updateTimerBlock(block, ms) {
-  const t = splitTime(ms);
-  const vals = [t.y, t.mo, t.d, t.h, t.m, t.s];
-  const units = block.querySelectorAll(".timer-val");
-  units.forEach((u, i) => { u.textContent = pad(vals[i]); });
-}
-
-function escHtml(str) {
-  return (str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+function updateTimerBlock(block,ms){
+  const t=splitMs(ms);
+  const vals=[t.y,t.mo,t.d,t.h,t.m,t.s];
+  block.querySelectorAll(".timer-val").forEach((u,i)=>{u.textContent=pad(vals[i]);});
 }
 
 render();
 
-// Service Worker
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js").catch(() => {});
-}
+if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script>
 </body>
 </html>
